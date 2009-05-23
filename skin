@@ -17,6 +17,7 @@ interface_filename leiska.png
 # Menu image
 menu_interface_filename menu.png
 
+# Test comment for svn :)
 # unit_status_text_topleft_corner is the top left pixel coordinate
 # pair (x)(y) for units description text
 unit_status_text_topleft_corner 30 470
