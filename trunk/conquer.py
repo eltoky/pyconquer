@@ -39,10 +39,12 @@ import gamemenu
 random.seed(round(time.time()))
 
 IH = classcollection.TIH()
+# Setting Release Version...
+conquer_version = "0.1"
 
 screeni = pygame.display.set_mode((800,600))
-pygame.display.set_caption("Conquer")
-# Puristetaan tehoja irti
+pygame.display.set_caption("Conquer " + conquer_version)
+# Puristetaan tehoja irti < Translate please!!!
 pygame.event.set_blocked(pygame.MOUSEMOTION)
 screeni.fill((0,0,0))
 
@@ -113,7 +115,7 @@ while main_loop_running:
 	tulos = mainmenu.get_selection()
 	if tulos == 0:
 		
-		# Luodaan menu jossa listataan loydetyt skenaariot
+		# Luodaan menu jossa listataan loydetyt skenaariot <- Translate please!!!
 		scenarios = gb.read_scenarios()
 		tuleva = []
 		tuleva.append(("Back to Menu",0,[],None))
@@ -139,7 +141,7 @@ while main_loop_running:
 			if tulos2 == 2:
 				break
 	if tulos == 3:
-		# FIX!!! Vaha jarkevamma nakoseks
+		# FIX!!! Vaha jarkevamma nakoseks <- Translate!!!
 		m1,m2 = gb.get_human_and_cpu_count()
 		gb.fillmap(0)
 		gb.map_edit_mode = True
