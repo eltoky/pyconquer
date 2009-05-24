@@ -58,7 +58,7 @@ class TGameMenu:
 		if self.menuitems[self.valinta][3]:
 			self.text_at(self.menuitems[self.valinta][3],(400,75),self.used_font)
 		self.text_at("Contact:", (400,520), self.used_font, vari = (50,185,10), wipe_background = False)
-		self.text_at("Conquer Dev Team, http://code.google.com/p/pyconquer/",(400,545)
+		self.text_at("Conquer Dev Team http://pyconquer.googlecode.com/",(400,545)
 		,self.used_font,vari=(50,185,10),wipe_background=False)
 	def rullaa(self,dy):
 		self.valinta += dy
