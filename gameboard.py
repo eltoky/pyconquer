@@ -1395,7 +1395,7 @@ class TGB:
 			kolorissi = (self.sc["making_moves_text_color"][0],self.sc["making_moves_text_color"][1],self.sc["making_moves_text_color"][2])
 			self.text_at("Player %s is making moves..."%(yksikko.nimi),
 			(self.sc["making_moves_text_topleft_corner"][0],self.sc["making_moves_text_topleft_corner"][1]), flippaa = True, fontti=font3, wipe_background = False,
-			vari = kolorissi)
+			color = kolorissi)
 
 			self.draw_scoreboard(True)
 			
