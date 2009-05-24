@@ -29,7 +29,7 @@ class TActor:
 		self.side = side
 		self.level = level
 		self.dump = dump
-		self.massit = 0
+		self.supplies = 0
 		self.moved = False
 		self.dead = False
 		self.income = 0
