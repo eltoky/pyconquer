@@ -61,7 +61,7 @@ class TAi:
 						if found_not_brute_force_solution:
 							continue
 							
-						# PlayerID of the possible move's land
+						# Player ID of the possible move's land
 						pala2 = self.board.data[self.board.gct(x2,y2)]
 
 						# Target must be enemy's land

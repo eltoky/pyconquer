@@ -53,6 +53,8 @@ class TCursor:
 			self.scroll_x = 0
 	def click(self):
 		if not self.board.map_edit_mode:
+			# We are not in map editing mode, so we check from
+			# skin configuration file if we clicked any gui elements.
 			if self.mouse_pos[0] >= self.board.sc["button_endturn"][0][0]:
 				if self.mouse_pos[1] >= self.board.sc["button_endturn"][0][1]:
 					if self.mouse_pos[0] <= self.board.sc["button_endturn"][1][0]:
@@ -96,7 +98,7 @@ class TCursor:
 			self.chosen_dump = None
 		else:
 			# Have we clicked gui elements?
-			# FIXME: change this to be modded with skin-file
+			# FIXME: change editor gui elements to be modded with skin-file
 			if self.mouse_pos[0] >= 620:
 				if self.mouse_pos[1] >= 366:
 					if self.mouse_pos[0] <= 782:
