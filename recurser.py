@@ -29,30 +29,30 @@ class TRecurser:
 		self.board = board
 		self.recursed_land = Set([])
 		self.recursed_own_land_count = 0
-	def count_capitals_on_island(self,x,y):
-		# Initialize list to be used in crawling
+	def count_dumps_on_island(self,x,y):
+		# Initialize set to be used in crawling
 		land_area_rec = Set([])
-		capitals_coord_list = []
+		dumps_coord_list = []
 		puolisko = self.board.data[self.board.gct(x,y)]
 		# Crawl from (x,y), save crawling to land_area_rec and
 		# crawl for playerid found in map data at (x,y)
 		self.crawl(x,y,land_area_rec,[self.board.data[self.board.gct(x,y)]])
 		# Lets iterate through crawled places
 		for coordinate in land_area_rec:
-			# Check if current coordinate has a capital
+			# Check if current coordinate has a dump
 			# (data can take the coordinate-string)
 			actorinssi = self.board.actorgctat(coordinate)
 			if (actorinssi):
-				if actorinssi.capital:
+				if actorinssi.dump:
 					if actorinssi.side != puolisko:
 						self.board.actors.remove(actorinssi)
 					else:
-						capitals_coord_list.append(coordinate)
-		return [capitals_coord_list,land_area_rec]
-	def recurse_new_random_coord_for_capital_on_island(self,x,y):
+						dumps_coord_list.append(coordinate)
+		return [dumps_coord_list,land_area_rec]
+	def recurse_new_random_coord_for_dump_on_island(self,x,y):
 		land_area_rec = Set([])
 		self.crawl(x,y,land_area_rec,[self.board.data[self.board.gct(x,y)]])
-		# Check if island has area to affor capital
+		# Check if island has area to affor dump
 		if len(land_area_rec) > 1:
 			# It has enough area
 			return [random.choice(list(land_area_rec)),list(land_area_rec)]
@@ -109,21 +109,19 @@ class TRecurser:
 		self.recursed_own_land_count = 0
 		self.crawl(x,y,self.recursed_land,[xychosen])
 		return self.recursed_own_land_count
-	def crawl(self,x,y,recursion_list,find_list):
-		#SetHmmset SETS for recursion_list?? find_list???
+	def crawl(self,x,y,recursion_set,find_list):
 		'''
 		x,y -> coordinates to start "crawling"
-		recursion_list -> list to hold already "crawled" coordinates
+		recursion_set -> set to hold already "crawled" coordinates
 		find_list -> list of playerid-lands to be searched
 		'''
 		edm = self.board.get_right_edm(y)
 		if self.board.validxy(x,y):
-		# Onko oma maa (eli onko maan omistaja kuin board.turn)
-		# koska nyt on menossa tan ai-instanssin vuoro
+			# The current land in find_list?
 			if self.board.data[self.board.gct(x,y)] in find_list:
-				# Katotaan ettie ruutu ole jo rekursoitu
-				if self.board.gct(x,y) not in recursion_list:
+				# Check whether the location has been crawled already
+				if self.board.gct(x,y) not in recursion_set:
 					self.recursed_own_land_count += 1
-					recursion_list.add(self.board.gct(x,y))
+					recursion_set.add(self.board.gct(x,y))
 					for i in xrange(6):
-						self.crawl(x+edm[i][0],y+edm[i][1],recursion_list,find_list)
+						self.crawl(x+edm[i][0],y+edm[i][1],recursion_set,find_list)
