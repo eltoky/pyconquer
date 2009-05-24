@@ -21,26 +21,28 @@ from os import sep,path
 #
 #------------------------------------------------------------------------
 
+# Instance of actor -> Soldier or Dump
 class TActor:
-	def __init__(self,x,y,side,voima=1,capital=False):
+	def __init__(self,x,y,side,level=1,dump=False):
 		self.x = x
 		self.y = y
 		self.side = side
-		self.voima = voima
-		self.capital = capital
+		self.level = level
+		self.dump = dump
 		self.massit = 0
 		self.moved = False
 		self.dead = False
 		self.income = 0
 		self.expends = 0
 
+# Instance for game cursor
 class TCursor:
 	def __init__(self,board):
 		self.x = 10
 		self.y = 10
 		self.scroll_x = 0
 		self.chosen_actor = None
-		self.chosen_capital = None
+		self.chosen_dump = None
 		self.board = board
 		self.mouse_pos = (0,0)
 	def scroll(self,dx):
@@ -49,7 +51,7 @@ class TCursor:
 			self.scroll_x = 15
 		if self.scroll_x < 0:
 			self.scroll_x = 0
-	def click(self): #592 444
+	def click(self):
 		if not self.board.map_edit_mode:
 			if self.mouse_pos[0] >= self.board.sc["button_endturn"][0][0]:
 				if self.mouse_pos[1] >= self.board.sc["button_endturn"][0][1]:
@@ -61,39 +63,40 @@ class TCursor:
 					if self.mouse_pos[0] <= self.board.sc["button_quit"][1][0]:
 						if self.mouse_pos[1] <= self.board.sc["button_quit"][1][1]:
 							self.chosen_actor = None
-							self.chosen_capital = None
+							self.chosen_dump = None
 							self.board.gamerunning = False
 			if self.mouse_pos[0] < 573 and self.mouse_pos[1] < 444:
 				if self.chosen_actor:
 					self.board.try_to_conquer(self.chosen_actor,self.x,self.y,False)
 					# CPU INTENSIVE?
-					self.board.destroy_lonely_capitals()
+					self.board.destroy_lonely_dumps()
 					# CPU INTENSIVE?
 					self.board.has_anyone_lost_the_game()
 					# CPU INTENSIVE?
 					if self.board.check_and_mark_if_someone_won():
 						self.turn = 0
-						#self.board.playerlist = []
 						self.board.data = {}
 						self.board.actors.clear()
 						self.board.fillmap(0)
 						return
 				else:
-					# Katsotaan onko klikattu omaa sotilasta
+					# Do we have clicked our own soldier?
 					klikki = self.board.actorat(self.x,self.y)
 					if klikki:
-						if not klikki.capital:
+						if not klikki.dump:
 							if klikki.side == self.board.turn:
-								# On, valitaan se
+								# Yes we have, choose it
 								self.chosen_actor = klikki
 								return
 						else:
 							if klikki.side == self.board.turn:
-								self.chosen_capital = klikki
+								self.chosen_dump = klikki
 								return
 			self.chosen_actor = None
-			self.chosen_capital = None
+			self.chosen_dump = None
 		else:
+			# Have we clicked gui elements?
+			# FIXME: change this to be modded with skin-file
 			if self.mouse_pos[0] >= 620:
 				if self.mouse_pos[1] >= 366:
 					if self.mouse_pos[0] <= 782:
@@ -118,7 +121,8 @@ class TCursor:
 			return (255,0,0)
 		else:
 			return (255,255,255)
-			
+		
+# Player that populates playerlist	
 class TPlayer:
 	def __init__(self,nimi1,id1,screen1,ai):
 		self.nimi = nimi1
@@ -128,6 +132,8 @@ class TPlayer:
 		self.won = False
 		self.ai_controller = ai
 		
+		
+# Simple Image Container (The Image Handler)
 class TIH:
 	def __init__(self):
 		self.images = {}
@@ -138,5 +144,4 @@ class TIH:
 		if self.images.has_key(id):
 			return self.images[id]
 		else:
-			# Menis aika huonosti taalla
 			return None

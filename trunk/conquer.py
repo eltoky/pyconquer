@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# Niko Reunanen
 # Conquer is strategy-flavoured game written with PyGame
 
 #------------------------------------------------------------------------
@@ -23,32 +22,50 @@
 #
 #------------------------------------------------------------------------
 
+# This is one of the sloppiest looking files in the project...
+
 import random,pygame,time,classcollection
 from sys import path
 from os import sep
 
 _DEBUG = 0
 
+# Initialize pygame
 pygame.init()
+
+# Path for game's graphics
 graphics_path = path[0] + sep + "images" + sep
+
+# Set the icon for the game window
 pygame.display.set_icon(pygame.image.load(graphics_path+"soldier.png"))
 
+# Import TheGameBoard and gamemenu
 from gameboard import TGB
 import gamemenu
 
+# Generate new random seed
 random.seed(round(time.time()))
 
+# Instance of ImageHandler to contain used images in one place
 IH = classcollection.TIH()
+
 # Setting Release Version...
 conquer_version = "0.1"
 
+# Initialize the screen and set resolution
 screeni = pygame.display.set_mode((800,600))
+
+# Set windows caption
 pygame.display.set_caption("Conquer " + conquer_version)
-# Puristetaan tehoja irti < Translate please!!!
+
+# Resources are greatly saved with this
 pygame.event.set_blocked(pygame.MOUSEMOTION)
+
+# Fill the screen with black color
 screeni.fill((0,0,0))
 
 # Sloppy, very sloppy... I know. Do you want to clean it?
+# Load used images into image container (IH)
 temppi = pygame.image.load(graphics_path+"skull7.png").convert()
 temppi.set_colorkey(temppi.get_at((0,0)))
 IH.add_image(temppi,"skull")
@@ -57,7 +74,7 @@ temppi.set_colorkey(temppi.get_at((0,0)))
 IH.add_image(temppi,"soldier")
 temppi = pygame.image.load(graphics_path+"rdump2.png").convert()
 temppi.set_colorkey(temppi.get_at((0,0)))
-IH.add_image(temppi,"capital")
+IH.add_image(temppi,"dump")
 temppi = pygame.image.load(graphics_path+"hextile2_.png").convert()
 temppi.set_colorkey(temppi.get_at((0,0)))
 IH.add_image(temppi,"1")
@@ -80,22 +97,25 @@ IH.add_image(pygame.image.load(graphics_path+"teksti.png").convert(),"logo")
 IH.add_image(pygame.image.load(graphics_path+"mapedit.png").convert(),"mapedit")
 
 gb = TGB(screeni,IH,path[0])
-# Jos on customoitu skini niin pitaahan tietaa
+
+# Load the skin file names
 paska = graphics_path+gb.sc.get("interface_filename","leiska.png")
 IH.add_image(pygame.image.load(paska).convert(),"interface")
 paska = graphics_path+gb.sc.get("menu_interface_filename","menu.png")
 IH.add_image(pygame.image.load(paska).convert(),"menu_interface")
+# Done Loading the images
+
 
 # We have nothing to lose if we try to use psyco.
 try:
 	import psyco
-# If Psyco is not installed it is not a problem
 except ImportError:
-	if _DEBUG > 0:
-		print "No psyco found, ok"
+	pass
+	# If Psyco is not installed it is not a problem
 else:
 	psyco.full()
 
+# Generate main menu
 mainmenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
 [("Play Scenario",0,[],"Play a premade map (scenarios-folder)"),
 ("Play Random Island",1,[],"Generate and play a random map"),
@@ -104,18 +124,21 @@ mainmenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
 ("Quit",4,[],None)],
 (800/2-10,200), spacing = 60)
 
+# Generate Options menu
 optionsmenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
 [("Show CPU moves with lines",0,["value_bool_editor",gb.show_cpu_moves_with_lines],"(Use left and right arrow key) Show CPU soldiers moves with lines."),
 ("CPU AI Recursion Depth",1,["value_int_editor",gb.ai_recursion_depth,[1,20]],"(Use left and right arrow key) Increase AI Recursion Depth: computer may play better but uses more CPU."),
 ("Return",2,[],None)],
 (800/2-10,200), spacing = 60)
 
+# The true main loop behing the whole application
 main_loop_running = True
 while main_loop_running:
+	# Get selection from main menu
 	tulos = mainmenu.get_selection()
 	if tulos == 0:
 		
-		# Luodaan menu jossa listataan loydetyt skenaariot <- Translate please!!!
+		# Dynamically generate menu from scenario - files
 		scenarios = gb.read_scenarios()
 		tuleva = []
 		tuleva.append(("Back to Menu",0,[],None))
@@ -127,21 +150,28 @@ while main_loop_running:
 		
 		muisti = newgamemenu.get_selection()
 		if muisti > 0:
+			# User selected a scenario
 			gb.map_edit_mode = False
-			gb.new_game(randommap = False, skenariofilu = newgamemenu.menuitems[muisti][0])
+			gb.new_game(randommap = False, scenariofile = newgamemenu.menuitems[muisti][0])
 			gb.start_game()
 	if tulos == 1:
+		# User selected to generate a random map
+		# Ask player counts
 		m1,m2 = gb.get_human_and_cpu_count()
 		gb.map_edit_mode = False
+		# Initialize a new game
 		gb.new_game(randommap = True, humanplayers = m1, randomplayers_cpu = m2)
+		# Start the game
 		gb.start_game()
 	if tulos == 2:
+		# User selected to see options
 		while 1:
 			tulos2 = optionsmenu.get_selection()
 			if tulos2 == 2:
 				break
 	if tulos == 3:
-		# FIX!!! Vaha jarkevamma nakoseks <- Translate!!!
+		# FIXME: little better looking
+		# User selected to edit a scenario
 		m1,m2 = gb.get_human_and_cpu_count()
 		gb.fillmap(0)
 		gb.map_edit_mode = True
@@ -151,4 +181,5 @@ while main_loop_running:
 		gb.map_edit_mode = False
 		gb.map_edit_info = []
 	if tulos == 4:
+		# User selected to quit the game
 		main_loop_running = False
