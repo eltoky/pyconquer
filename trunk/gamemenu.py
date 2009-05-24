@@ -17,7 +17,7 @@ import pygame
 #    You should have received a copy of the GNU General Public License
 #    along with Conquer.  If not, see <http://www.gnu.org/licenses/>.
 #
-#    Copyright Niko Reunanen
+#    Copyright Conquer Development Team (http://code.google.com/p/pyconquer/)
 #
 #------------------------------------------------------------------------
 
@@ -57,7 +57,8 @@ class TGameMenu:
 			# Caption Text
 		if self.menuitems[self.valinta][3]:
 			self.text_at(self.menuitems[self.valinta][3],(400,75),self.used_font)
-		self.text_at("Niko Reunanen, contact: nikoreunanen@gmail.com",(400,545)
+		self.text_at("Contact:", (400,520), self.used_font, vari = (50,185,10), wipe_background = False)
+		self.text_at("Conquer Dev Team, http://code.google.com/p/pyconquer/",(400,545)
 		,self.used_font,vari=(50,185,10),wipe_background=False)
 	def rullaa(self,dy):
 		self.valinta += dy
