@@ -110,11 +110,11 @@ class TRecurser:
 		self.crawl(x,y,self.recursed_land,[xychosen])
 		return self.recursed_own_land_count
 	def crawl(self,x,y,recursion_set,find_list):
-		'''
+		"""
 		x,y -> coordinates to start "crawling"
 		recursion_set -> set to hold already "crawled" coordinates
-		find_list -> list of playerid-lands to be searched
-		'''
+		find_list -> list of players whose lands are to be searched
+		"""
 		edm = self.board.get_right_edm(y)
 		if self.board.validxy(x,y):
 			# The current land in find_list?
@@ -124,4 +124,5 @@ class TRecurser:
 					self.recursed_own_land_count += 1
 					recursion_set.add(self.board.gct(x,y))
 					for i in xrange(6):
+						# Crawl neighbours
 						self.crawl(x+edm[i][0],y+edm[i][1],recursion_set,find_list)

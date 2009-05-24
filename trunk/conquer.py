@@ -40,6 +40,7 @@ graphics_path = path[0] + sep + "images" + sep
 pygame.display.set_icon(pygame.image.load(graphics_path+"soldier.png"))
 
 # Import TheGameBoard and gamemenu
+import gameboard
 from gameboard import TGB
 import gamemenu
 
@@ -64,46 +65,17 @@ pygame.event.set_blocked(pygame.MOUSEMOTION)
 # Fill the screen with black color
 screeni.fill((0,0,0))
 
-# Sloppy, very sloppy... I know. Do you want to clean it?
-# Load used images into image container (IH)
-temppi = pygame.image.load(graphics_path+"skull7.png").convert()
-temppi.set_colorkey(temppi.get_at((0,0)))
-IH.add_image(temppi,"skull")
-temppi = pygame.image.load(graphics_path+"soldier.png").convert()
-temppi.set_colorkey(temppi.get_at((0,0)))
-IH.add_image(temppi,"soldier")
-temppi = pygame.image.load(graphics_path+"rdump2.png").convert()
-temppi.set_colorkey(temppi.get_at((0,0)))
-IH.add_image(temppi,"dump")
-temppi = pygame.image.load(graphics_path+"hextile2_.png").convert()
-temppi.set_colorkey(temppi.get_at((0,0)))
-IH.add_image(temppi,"1")
-temppi = pygame.image.load(graphics_path+"hextile_.png").convert()
-temppi.set_colorkey(temppi.get_at((0,0)))
-IH.add_image(temppi,"2")
-temppi = pygame.image.load(graphics_path+"hextile3_.png").convert()
-temppi.set_colorkey(temppi.get_at((0,0)))
-IH.add_image(temppi,"3")
-temppi = pygame.image.load(graphics_path+"hextile4_.png").convert()
-temppi.set_colorkey(temppi.get_at((0,0)))
-IH.add_image(temppi,"4")
-temppi = pygame.image.load(graphics_path+"hextile5_.png").convert()
-temppi.set_colorkey(temppi.get_at((0,0)))
-IH.add_image(temppi,"5")
-temppi = pygame.image.load(graphics_path+"hextile6_.png").convert()
-temppi.set_colorkey(temppi.get_at((0,0)))
-IH.add_image(temppi,"6")
-IH.add_image(pygame.image.load(graphics_path+"teksti.png").convert(),"logo")
-IH.add_image(pygame.image.load(graphics_path+"mapedit.png").convert(),"mapedit")
+# Load images into image container, IH. (but not the interface images yet)
+gameboard.load_image_files_but_not_interface_image_files(IH,graphics_path)
 
+# Create the Game Board
+# Parameters: pygame screen, image container and game path
 gb = TGB(screeni,IH,path[0])
 
-# Load the skin file names
-paska = graphics_path+gb.sc.get("interface_filename","leiska.png")
-IH.add_image(pygame.image.load(paska).convert(),"interface")
-paska = graphics_path+gb.sc.get("menu_interface_filename","menu.png")
-IH.add_image(pygame.image.load(paska).convert(),"menu_interface")
-# Done Loading the images
+# Load the interface images... at the moment they need
+# to be loaded after the Game Board has an instance
+IH.add_image(pygame.image.load(graphics_path+gb.sc.get("interface_filename","leiska.png")).convert(),"interface")
+IH.add_image(pygame.image.load(graphics_path+gb.sc.get("menu_interface_filename","menu.png")).convert(),"menu_interface")
 
 
 # We have nothing to lose if we try to use psyco.
@@ -114,6 +86,7 @@ except ImportError:
 	# If Psyco is not installed it is not a problem
 else:
 	psyco.full()
+
 
 # Generate main menu
 mainmenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
@@ -138,48 +111,74 @@ while main_loop_running:
 	tulos = mainmenu.get_selection()
 	if tulos == 0:
 		
-		# Dynamically generate menu from scenario - files
-		scenarios = gb.read_scenarios()
-		tuleva = []
-		tuleva.append(("Back to Menu",0,[],None))
-		for i,scenario in enumerate(scenarios):
-			tuleva.append((scenario,i+1,[],None))
-		newgamemenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
-		tuleva,
-		(800/2-10,200), spacing = 30)
+		# Dynamically generate menu items from scenario - files
 		
-		muisti = newgamemenu.get_selection()
-		if muisti > 0:
+		# Read scenarios
+		scenarios = gb.read_scenarios()
+		
+		generated_menu_items = []
+		
+		# Add option to step back to main menu 
+		generated_menu_items.append(("Back to Menu",0,[],None))
+		
+		# Add scenarios as menuitems
+		for i,scenario in enumerate(scenarios):
+			generated_menu_items.append((scenario,i+1,[],None))
+			
+		# Build the menu
+		newgamemenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
+		generated_menu_items, (800/2-10,200), spacing = 30)
+		
+		# Get selection from the newly build menu
+		selection = newgamemenu.get_selection()
+		if selection > 0:
 			# User selected a scenario
 			gb.map_edit_mode = False
-			gb.new_game(randommap = False, scenariofile = newgamemenu.menuitems[muisti][0])
+			gb.new_game(randommap = False, scenariofile = newgamemenu.menuitems[selection][0])
 			gb.start_game()
+
+	# User selected to generate a random map
 	if tulos == 1:
-		# User selected to generate a random map
 		# Ask player counts
 		m1,m2 = gb.get_human_and_cpu_count()
 		gb.map_edit_mode = False
+		
 		# Initialize a new game
 		gb.new_game(randommap = True, humanplayers = m1, randomplayers_cpu = m2)
+		
 		# Start the game
 		gb.start_game()
+
+	# User selected to see options
 	if tulos == 2:
-		# User selected to see options
 		while 1:
+			# Get selections from the options menu and break the loop
+			# if user wants to get back to the main menu
 			tulos2 = optionsmenu.get_selection()
 			if tulos2 == 2:
 				break
+
+	# User selected to edit a scenario
 	if tulos == 3:
 		# FIXME: little better looking
-		# User selected to edit a scenario
+		# Ask player counts
 		m1,m2 = gb.get_human_and_cpu_count()
+		
+		# Fill map with empty space
 		gb.fillmap(0)
+		
+		# Turn the editing mode on
 		gb.map_edit_mode = True
 		gb.map_edit_info = [m1,m2,1]
 		gb.actors.clear()
+		
+		# Start Editing
 		gb.start_game()
+		# Editing Finished
+		
 		gb.map_edit_mode = False
 		gb.map_edit_info = []
+		
+	# User selected to quit the game
 	if tulos == 4:
-		# User selected to quit the game
 		main_loop_running = False
