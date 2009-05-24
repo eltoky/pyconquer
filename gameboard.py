@@ -492,31 +492,65 @@ class TGB:
 				return player
 		return None
 	def merge_dumps(self,dump_coords,island_area):
-		uusisumma = 0
+		"""
+		Merge dumps if islands has more than one dump
+		dump_coords -> list of dump coordinates
+		island_area -> list of island's lands coordinates
+		"""
+		
+		# Summed supplies from islands dumps
+		summed_supplies = 0
+		
+		# List of dumps to be removed
 		deletelist = []
+		
+		# If we have more than one dump on island and the island_area has items
 		if len(dump_coords) > 1 and island_area:
-			puoli = self.actorgctat(dump_coords[0]).side
+			# Get player side (id) from first dump
+			side = self.actorgctat(dump_coords[0]).side
+			
+			# Iterate through dump coordinates
 			for coord in dump_coords:
-				kalu = self.actorgctat(coord)
-				if kalu:
+				# Get the dump's actor - instance
+				current_dump = self.actorgctat(coord)
+				
+				# Check if the instance was found
+				if current_dump:
+					# Get random land coordinate of the island...
+					# It does not matter which land of the island
 					x11,y11 = self.ec(island_area[0])
-					if kalu.dump and kalu.side==self.data[self.gct(x11,y11)]:
-						uusisumma += kalu.massit
-						deletelist.append(kalu)
+					
+					# Check if found actor is actually a dump (good to be careful)
+					# and it's side is the same as islands
+					if current_dump.dump and current_dump.side==self.data[self.gct(x11,y11)]:
+						# We'll add the dumps supplies in the sum counter
+						summed_supplies += current_dump.supplies
+						
+						# The dump is going to be discarded
+						deletelist.append(current_dump)
+			
+			# From actors remove every item in deletelist
 			while deletelist:
 				self.actors.discard(deletelist.pop())
+				
+			# Select a random location on the island for the new and only dump
 			ok = False
 			tries = 0
 			while not ok and tries < 100:
+				# We'll try 100 times to find a location
 				tries += 1
 				uus_k = random.choice(island_area)
-				kaija = self.actorgctat(uus_k)
-				if not kaija:
+				occupied = self.actorgctat(uus_k)
+				# If the location doesn't have an actor, it is legal place
+				if not occupied:
 					ok = True
 			if tries < 100:
+				# a Place was found for the new dump
 				x11,y11 = self.ec(uus_k)
-				new_shared_resource_dump = TActor(x11,y11,puoli,level=0,dump=True)
-				new_shared_resource_dump.massit = uusisumma
+				# Create the dump
+				new_shared_resource_dump = TActor(x11,y11,side,level=0,dump=True)
+				new_shared_resource_dump.supplies = summed_supplies
+				# Now the dump is registered
 				self.actors.add(new_shared_resource_dump)
 	def fill_dumps(self):
 		# Fill dumps should be called when lands are conquered
@@ -587,6 +621,7 @@ class TGB:
 		# No actor found, return None
 		return None
 	def fill_random_units(self,d):
+		# Obsolete
 		pelaajat = self.get_player_id_list()
 		if (d > 0):
 			while (d > 0):
@@ -606,6 +641,12 @@ class TGB:
 					self.actors.add(TActor(x,y,self.data[self.gct(x,y)],level=random.randint(1,3)))
 				d -= 1
 	def fill_random_boxes(self,d,for_who,max_x):
+		"""
+		Fills a random box in the map
+		for_who -> list of playerid:s (randomly selected for land owned)
+		max_x -> map width
+		"""
+		# This just basically randoms coordinates and fills map
 		if (d > 0):
 			while (d > 0):
 				x = random.randint(1,max_x)
@@ -646,9 +687,9 @@ class TGB:
 				self.cursor.chosen_actor = None
 				self.cursor.chosen_dump = None
 				if player.ai_controller:
-					self.text_at("Player %s won the game!" % player.nimi,(200,200),fontti=font4,vari=(255,255,255)) 
+					self.text_at("Player %s won the game!" % player.nimi,(200,200),fontti=font4,color=(255,255,255)) 
 				else:
-					self.text_at("You (%s) won the game!" % player.nimi,(200,200),fontti=font4,vari=(255,255,255))
+					self.text_at("You (%s) won the game!" % player.nimi,(200,200),fontti=font4,color=(255,255,255))
 
 		counter = 0
 		# Draw the scores, counter puts text in right row.
@@ -660,7 +701,7 @@ class TGB:
 			
 			self.text_at("%d     %s" % (jau[1],jau[0].nimi),(self.sc["scoreboard_text_topleft_corner"][0]+15,
 			
-			self.sc["scoreboard_text_topleft_corner"][1]+35*counter),vari=(self.sc["scoreboard_text_color"][0],
+			self.sc["scoreboard_text_topleft_corner"][1]+35*counter),color=(self.sc["scoreboard_text_color"][0],
 			self.sc["scoreboard_text_color"][1],self.sc["scoreboard_text_color"][2]),fontti=font4,wipe_background = False)
 			
 			counter += 1
@@ -672,11 +713,11 @@ class TGB:
 			if not tahko.ai_controller:
 				if not tahko.lost:
 					# Human player's turn, tell it
-					self.text_at("Your (%s) turn" % (tahko.nimi),(630,300),vari=(0,0,0),
+					self.text_at("Your (%s) turn" % (tahko.nimi),(630,300),color=(0,0,0),
 					fontti=font3,wipe_background = False)
 				else:
 					# The human player has lost, tell it
-					self.text_at("You (%s) lost..." % (tahko.nimi),(635,300),vari=(0,0,0),
+					self.text_at("You (%s) lost..." % (tahko.nimi),(635,300),color=(0,0,0),
 					fontti=font3,wipe_background = False)
 		except:
 			# Error concured, well do nothing about it...
@@ -706,21 +747,21 @@ class TGB:
 				teksti = "Land #%d without player" % self.map_edit_info[2]
 
 		# Show the selected map tile text		
-		self.text_at("Selected:",(620,80), fontti = font4, wipe_background=False,vari=(0,0,0))
-		self.text_at(teksti,(620,100), fontti = font4, wipe_background=False,vari=(0,0,0))
+		self.text_at("Selected:",(620,80), fontti = font4, wipe_background=False,color=(0,0,0))
+		self.text_at(teksti,(620,100), fontti = font4, wipe_background=False,color=(0,0,0))
 		
 		# Draw players captions in the scenario
 		counter = 0
 		for i in xrange(0,self.map_edit_info[0]):
 			counter += 1
-			self.text_at("Player #%d = Human"%counter,(620,130+counter*20), fontti = font4, wipe_background=False,vari=(0,0,0))
+			self.text_at("Player #%d = Human"%counter,(620,130+counter*20), fontti = font4, wipe_background=False,color=(0,0,0))
 		for i in xrange(0,self.map_edit_info[1]):
 			counter += 1
-			self.text_at("Player #%d = CPU" % counter,(620,130+counter*20), fontti = font4, wipe_background=False,vari=(0,0,0))
+			self.text_at("Player #%d = CPU" % counter,(620,130+counter*20), fontti = font4, wipe_background=False,color=(0,0,0))
 		if (6-counter) > 0:
 			for i in range(0,(6-counter)):
 				counter += 1
-				self.text_at("Player #%d = No player" % counter,(620,130+counter*20), fontti = font4, wipe_background=False,vari=(0,0,0))
+				self.text_at("Player #%d = No player" % counter,(620,130+counter*20), fontti = font4, wipe_background=False,color=(0,0,0))
 	def drawmap(self):
 		"""
 		Game window's drawing routines
@@ -758,7 +799,7 @@ class TGB:
 							# If the dump is on our side and we are not AI controlled, then we'll
 							# draw the supply count on the dump.
 							if actor.side == self.turn and not self.get_player_by_side(actor.side).ai_controller:
-								self.text_at("%d"%actor.massit,(pixelX+14,pixelY+17),fontti=font2)
+								self.text_at("%d"%actor.supplies,(pixelX+14,pixelY+17),fontti=font2)
 						else:
 							# a Soldier was found
 							# Make a text for soldier-> level and X if moved
@@ -779,10 +820,10 @@ class TGB:
 		if self.cursor.chosen_dump:
 			kolorissi = (self.sc["unit_status_text_color"][0],self.sc["unit_status_text_color"][1],self.sc["unit_status_text_color"][2])
 			x1,y1 = self.sc["unit_status_text_topleft_corner"][0],self.sc["unit_status_text_topleft_corner"][1]
-			self.text_at("Resource dump",(x1,y1+30),fontti=font4,wipe_background=False,vari=kolorissi)
-			self.text_at("Income: %d" % self.cursor.chosen_dump.income,(x1,y1+50),fontti=font4,wipe_background=False,vari=kolorissi)
-			self.text_at("Expends: %d" % self.cursor.chosen_dump.expends,(x1,y1+70),fontti=font4,wipe_background=False,vari=kolorissi)
-			self.text_at("Supplies: %d" % self.cursor.chosen_dump.massit,(x1,y1+90),fontti=font4,wipe_background=False,vari=kolorissi)
+			self.text_at("Resource dump",(x1,y1+30),fontti=font4,wipe_background=False,color=kolorissi)
+			self.text_at("Income: %d" % self.cursor.chosen_dump.income,(x1,y1+50),fontti=font4,wipe_background=False,color=kolorissi)
+			self.text_at("Expends: %d" % self.cursor.chosen_dump.expends,(x1,y1+70),fontti=font4,wipe_background=False,color=kolorissi)
+			self.text_at("Supplies: %d" % self.cursor.chosen_dump.supplies,(x1,y1+90),fontti=font4,wipe_background=False,color=kolorissi)
 			self.screen.blit(self.pics.gi("dump"),(x1,y1))
 	def get_human_and_cpu_count(self):
 		# This is very ugly piece of code.
@@ -921,7 +962,7 @@ class TGB:
 		for city in self.actors.copy():
 
 			# Alive Dump & current turn player's & has (supplies > 0)
-			if not city.dead and city.dump and city.massit > 0 and city.side == self.turn:
+			if not city.dead and city.dump and city.supplies > 0 and city.side == self.turn:
 				
 				# Has the island space for a new soldier?
 				# tulos[0] new random place for actor (not checked if legal)
@@ -1031,7 +1072,7 @@ class TGB:
 					return
 				
 				# Not enough supplies?
-				if city.massit < 1:
+				if city.supplies < 1:
 					return
 					
 				if ok:
@@ -1039,7 +1080,7 @@ class TGB:
 					m11 = random.randint(0,1)
 					m22 = random.randint(0,1)
 					# Little variation...
-					while city.massit > m11 and (city.income-city.expends) > m22:
+					while city.supplies > m11 and (city.income-city.expends) > m22:
 						ok2 = False
 						while not ok2 and tries < 500:
 							tries += 1
@@ -1048,7 +1089,7 @@ class TGB:
 								ok2=True
 						if ok2:
 							# Add new soldier and make financial calculus
-							city.massit -= 1
+							city.supplies -= 1
 							city.expends += 1
 							city.income -= 1
 							tulos1 = tulos[0].split(" ")
@@ -1067,7 +1108,7 @@ class TGB:
 		
 		running = True
 		# We'll update as long as supplies are used or panic has arisen
-		while city.massit > critical_cash and running:
+		while city.supplies > critical_cash and running:
 			tries += 1
 			# We'll try one hundred times
 			if tries == 100:
@@ -1098,10 +1139,10 @@ class TGB:
 							
 							# Soldier is updated
 							city.expends += 1
-							city.massit -= 1
+							city.supplies -= 1
 							ukko.level += 1
 							# Panic with supplies?
-							if city.massit <= critical_cash:
+							if city.supplies <= critical_cash:
 								running = False
 							if (city.income - city.expends) == critical_cash:
 								running = False
@@ -1195,8 +1236,8 @@ class TGB:
 				kaupunki.income = tulot
 				kaupunki.expends = menot
 				if not just_do_math:
-					kaupunki.massit += (kaupunki.income - kaupunki.expends)
-					if kaupunki.massit < 0:
+					kaupunki.supplies += (kaupunki.income - kaupunki.expends)
+					if kaupunki.supplies < 0:
 						# Not enough supplies, islands soldiers are going
 						# to be terminated.
 						kuolema.extend(mahdollinen_kuolema)
@@ -1207,8 +1248,11 @@ class TGB:
 			while kuolema:
 				tmp = kuolema.pop()
 				if self.seenxy(tmp.x,tmp.y):
+					# a Skull is drawn on the dead soldier
 					pixelX,pixelY = self.hexMapToPixel(tmp.x-self.cursor.scroll_x,tmp.y)
 					self.screen.blit(self.pics.gi("skull"),(pixelX+10,pixelY+10))
+					
+					# Remove the soldier from registered actors
 					if tmp in self.actors:
 						self.actors.discard(tmp)
 			tmp = None
@@ -1232,38 +1276,68 @@ class TGB:
 			hexMapX=gridX+hex_system.gridEvenRows[gridPixelY][gridPixelX][0]
 			hexMapY=gridY+hex_system.gridEvenRows[gridPixelY][gridPixelX][1]
 		return (hexMapX,hexMapY)
-	def text_at(self,teksti,coords,wipe_background=True,fontti=font2,vari=(255,255,255),flippaa=False):
+	def text_at(self,text,coords,wipe_background=True,fontti=font2,color=(255,255,255),flippaa=False):
+		"""
+		Render text
+		text -> text to be drawn
+		coords -> a tuple of coordinates (x,y)
+		wipe_background=True -> draw a box behing the text
+		fontti=font2 -> font to be used
+		color = (255,255,255) -> font color
+		flippaa = False -> immediately flip the screen
+		"""
+		
 		# Render text
-		text = fontti.render(teksti,1,vari)
-		koko = fontti.size(teksti)
+		text_ = fontti.render(text,1,color)
+		
+		# Wipe_Background
+		koko = fontti.size(text)
 		if wipe_background:
 			pygame.draw.rect(self.screen,(0,0,0),(coords[0],coords[1],koko[0],koko[1]))
-		self.screen.blit(text,(coords[0],coords[1]))
+			
+		# Draw the text on a screen
+		self.screen.blit(text_,(coords[0],coords[1]))
 		if flippaa:
 			pygame.display.flip()
 	def draft_soldier(self,x,y):
 		# Soldier drafting function used by human player
 		if self.data[self.gct(x,y)] != self.turn:
 			return
-			
-		paivita = self.actorat(x,y)
-		if paivita:
-			if paivita.dump:
+		
+		# Get the actor instance
+		soldier_to_update = self.actorat(x,y)
+		
+		# Check if actor was found
+		if soldier_to_update:
+			# Dump is not allowed
+			if soldier_to_update.dump:
 				return
-			if paivita.level == 6:
+			# We do not update level 6 soldiers
+			if soldier_to_update.level == 6:
 				return
 
+		# Get the islands resource dump
 		tulos = self.rek.count_dumps_on_island(x,y)
+		
+		# I hope we find just one dump ;)
 		if len(tulos[0]) == 1:
+			
+			# Get the dump actor instance
 			actor = self.actorgctat(tulos[0][0])
 			if actor:
 				if actor.dump:
-					if actor.massit > 0:
-						actor.massit -= 1
-						if not paivita:
+					# Found the dump, check if it has supplies
+					if actor.supplies > 0:
+						# It has, now minus 1
+						actor.supplies -= 1
+						if not soldier_to_update:
+							# There wasn't a soldier to update, player
+							# draft a new
 							self.actors.add(TActor(x,y,actor.side,level=1,dump=False))
 						else:
-							paivita.level += 1
+							# The soldier is now updated
+							soldier_to_update.level += 1
+						# Calculate dumps income and expends
 						self.salary_time_to_dumps_by_turn([self.turn],True)
 	def end_turn(self):
 		# CPU INTENSIVE?
@@ -1271,14 +1345,16 @@ class TGB:
 		# CPU INTENSIVE?
 		self.has_anyone_lost_the_game()
 		
+		# Mark winner if found and get immediately "True"
+		# if winner was found
 		if self.check_and_mark_if_someone_won():
-			# If someone won, break the recursion loop
+			# Someone won, break the recursion loop
 			self.turn = 0
 			self.data = {}
 			self.actors.clear()
 			self.fillmap(0)
 			return
-		
+			
 		for peluri in self.playerlist:
 			if peluri.won:
 				return

@@ -112,7 +112,7 @@ class TAi:
 									# we'll add it into moves points
 									if defender.dump and current_actor.level > 1:
 										rekursiotulos += 6
-										rekursiotulos += defender.massit
+										rekursiotulos += defender.supplies
 										rekursiotulos += (defender.income - defender.expends)
 										if rekursiotulos < 6:
 											rekursiotulos = 6
