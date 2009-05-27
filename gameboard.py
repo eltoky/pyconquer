@@ -1434,13 +1434,13 @@ class TGB:
 
 
 def load_image_files_but_not_interface_image_files(imagehandler,graphics_path):
-	temppi = pygame.image.load(graphics_path+"skull7.png").convert()
+	temppi = pygame.image.load(graphics_path+"skull7.png").convert_alpha()
 	temppi.set_colorkey(temppi.get_at((0,0)))
 	imagehandler.add_image(temppi,"skull")
-	temppi = pygame.image.load(graphics_path+"soldier.png").convert()
+	temppi = pygame.image.load(graphics_path+"soldier.png").convert_alpha()
 	temppi.set_colorkey(temppi.get_at((0,0)))
 	imagehandler.add_image(temppi,"soldier")
-	temppi = pygame.image.load(graphics_path+"rdump2.png").convert()
+	temppi = pygame.image.load(graphics_path+"armytent.png").convert_alpha()
 	temppi.set_colorkey(temppi.get_at((0,0)))
 	imagehandler.add_image(temppi,"dump")
 	temppi = pygame.image.load(graphics_path+"hextile2_.png").convert()
