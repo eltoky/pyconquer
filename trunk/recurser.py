@@ -95,7 +95,23 @@ class TRecurser:
 						self.recursed_own_land_count = 0
 						self.crawl(x,y,recursed_islands,[self.board.turn])
 						laskuri += 1
-		return laskuri                         
+		return laskuri
+	def get_island_border_lands(self,x,y):
+		land_area_set = Set([])
+		island_owner = self.board.data[self.board.gct(x,y)]
+		self.crawl(x,y,land_area_set,[ island_owner ])
+		border_area_set = Set([])
+		for gct_xy in land_area_set:
+			x1,y1 = self.board.ec(gct_xy)
+			edm = self.board.get_right_edm(y1)
+			for i in xrange(6):
+				if self.board.validxy(x1+edm[i][0],y1+edm[i][1]):
+					if self.board.data[self.board.gct(x1+edm[i][0],y1+edm[i][1])] != island_owner:
+						if self.board.data[self.board.gct(x1+edm[i][0],y1+edm[i][1])] != 0:
+							# This works because set can't have duplicates
+							border_area_set.add( self.board.gct(x1+edm[i][0],y1+edm[i][1]) )
+		return border_area_set
+		 
 	def recurse_own_island(self,x,y):
 		# Count and recurse through own islands lands
 		self.recursed_land.clear()
