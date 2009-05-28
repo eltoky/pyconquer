@@ -54,8 +54,10 @@ class TGameMenu:
 			
 			# Menu item color is white
 			kolori = (0,0,0)
+			shadow = True
 			if i == self.valinta:
 				# Selected menu item is red
+				shadow = False
 				kolori = (255,0,0)
 			
 			# Text to be rendered
@@ -73,7 +75,7 @@ class TGameMenu:
 			
 			# Draw the menu item text
 			self.text_at(teksti,(self.start_x,self.start_y+self.spacing*i),
-			self.used_font,vari = kolori, wipe_background=False)
+			self.used_font,vari = kolori, wipe_background=False, drop_shadow = shadow)
 			
 		# Caption Text
 		if self.menuitems[self.valinta][3]:
@@ -139,11 +141,17 @@ class TGameMenu:
 						self.edit_value(1)
 						self.draw_items(teksti)
 			pygame.display.flip()
-	def text_at(self,teksti,coords,fontti,wipe_background=True,vari=(255,255,255),keskita=True,flippaa=False):
+	def text_at(self,teksti,coords,fontti,wipe_background=True,drop_shadow=True,vari=(255,255,255),keskita=True,flippaa=False):
 		text = fontti.render(teksti,1,vari)
 		koko = fontti.size(teksti)
 		if wipe_background:
 			pygame.draw.rect(self.ruutu,(0,0,0),(coords[0]-(koko[0]/2),coords[1],koko[0],koko[1]))
+
+		# Shadow
+		if drop_shadow:
+			shadow_text_ = fontti.render(teksti,1,(255 - vari[0],255 - vari[1],255 - vari[2]))
+			self.ruutu.blit(shadow_text_,(coords[0]-(koko[0]/2)+1,coords[1]+1))
+
 		self.ruutu.blit(text,(coords[0]-(koko[0]/2),coords[1]))
 		if flippaa:
 			pygame.display.flip()
