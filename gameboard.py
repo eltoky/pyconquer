@@ -232,7 +232,7 @@ class TGB:
 					# Right mouse button = draft and update soldiers if
 					# NOT in map editing mode
 					if not self.map_edit_mode:
-						if eventti.button == 3:
+						if eventti.button == 3 and y1 < 14 and x1 < 15 :
 							self.draft_soldier(self.cursor.x,self.cursor.y)
 				# Key press
 				if eventti.type == pygame.KEYDOWN:
@@ -799,7 +799,8 @@ class TGB:
 							# If the dump is on our side and we are not AI controlled, then we'll
 							# draw the supply count on the dump.
 							if actor.side == self.turn and not self.get_player_by_side(actor.side).ai_controller:
-								self.text_at("%d"%actor.supplies,(pixelX+14,pixelY+17),fontti=font2)
+								#self.text_at("%d"%actor.supplies,(pixelX+16,pixelY+11),fontti=font2,color=(0,0,0),wipe_background = False)
+								self.text_at("%d"%actor.supplies,(pixelX+15,pixelY+10),fontti=font2,wipe_background = False)
 						else:
 							# a Soldier was found
 							# Make a text for soldier-> level and X if moved
@@ -1276,7 +1277,7 @@ class TGB:
 			hexMapX=gridX+hex_system.gridEvenRows[gridPixelY][gridPixelX][0]
 			hexMapY=gridY+hex_system.gridEvenRows[gridPixelY][gridPixelX][1]
 		return (hexMapX,hexMapY)
-	def text_at(self,text,coords,wipe_background=True,fontti=font2,color=(255,255,255),flippaa=False):
+	def text_at(self,text,coords,wipe_background=True,drop_shadow=True,fontti=font2,color=(255,255,255),flippaa=False):
 		"""
 		Render text
 		text -> text to be drawn
@@ -1294,7 +1295,12 @@ class TGB:
 		koko = fontti.size(text)
 		if wipe_background:
 			pygame.draw.rect(self.screen,(0,0,0),(coords[0],coords[1],koko[0],koko[1]))
-			
+		
+		# Shadow
+		if drop_shadow:
+			shadow_text_ = fontti.render(text,1,(255 - color[0],255 - color[1],255 - color[2]))
+			self.screen.blit(shadow_text_,(coords[0]+1,coords[1]+1))
+		
 		# Draw the text on a screen
 		self.screen.blit(text_,(coords[0],coords[1]))
 		if flippaa:
