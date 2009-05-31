@@ -117,7 +117,8 @@ class TCursor:
 						if self.mouse_pos[1] <= 591:
 							self.board.gamerunning = False
 			if self.mouse_pos[0] < 573 and self.mouse_pos[1] < 444:
-				self.board.data[self.board.gct(self.x,self.y)] = self.board.map_edit_info[2]
+				if self.x > 0 and self.y > 0 and self.y < 13 and self.x < 29:
+					self.board.data[self.board.gct(self.x,self.y)] = self.board.map_edit_info[2]
 	def get_color(self):
 		if self.chosen_actor:
 			return (255,0,0)
