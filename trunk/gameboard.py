@@ -215,6 +215,11 @@ class TGB:
 			# Limit fps to 30, smaller resource usage
 			clock.tick(30)
 			
+			pelaaja = self.get_player_by_side(self.turn)
+			if pelaaja:
+				if pelaaja.ai_controller or pelaaja.lost:
+					self.end_turn()
+			
 			# Iterate through events
 			for eventti in pygame.event.get():
 				# Mouse click
@@ -473,7 +478,7 @@ class TGB:
 				self.text_at(self.block_desc(tulos[3]),(pixelX,pixelY+15),fontti=font2)
 				pygame.display.flip()
 				# Little time to actually see it
-				time.sleep(0.45)
+				time.sleep(0.35)
 				self.drawmap()
 				pygame.display.flip()
 	def block_desc(self,r):
@@ -690,6 +695,7 @@ class TGB:
 					self.text_at("Player %s won the game!" % player.nimi,(200,200),fontti=font4,color=(255,255,255)) 
 				else:
 					self.text_at("You (%s) won the game!" % player.nimi,(200,200),fontti=font4,color=(255,255,255))
+				pygame.display.flip()
 
 		counter = 0
 		# Draw the scores, counter puts text in right row.
@@ -794,13 +800,13 @@ class TGB:
 					if actor:
 						if actor.dump:
 							# a Resource Dump was found
-							self.screen.blit(self.pics.gi("dump"),(pixelX+3,pixelY+5))
+							self.screen.blit(self.pics.gi("dump"),(pixelX+3,pixelY+8))
 							
 							# If the dump is on our side and we are not AI controlled, then we'll
 							# draw the supply count on the dump.
 							if actor.side == self.turn and not self.get_player_by_side(actor.side).ai_controller:
 								#self.text_at("%d"%actor.supplies,(pixelX+16,pixelY+11),fontti=font2,color=(0,0,0),wipe_background = False)
-								self.text_at("%d"%actor.supplies,(pixelX+15,pixelY+10),fontti=font2,wipe_background = False)
+								self.text_at("%d"%actor.supplies,(pixelX+15,pixelY+13),fontti=font2,wipe_background = False)
 						else:
 							# a Soldier was found
 							# Make a text for soldier-> level and X if moved
@@ -1260,7 +1266,6 @@ class TGB:
 					
 			if kuolema:
 				pygame.display.flip()
-				time.sleep(1)
 			kuolema = []
 			mahdollinen_kuolema = []
 	def pixelToHexMap(self,(x1,y1)):
@@ -1371,7 +1376,7 @@ class TGB:
 		# Check if all players are scheduled already
 		if len(self.playerlist)+1 <= self.turn:
 			# Show last player's moves
-			time.sleep(1.25)
+			time.sleep(0.2)
 			self.turn = 1
 			# Every actor's "moved" is reseted
 			for actori in self.actors:
@@ -1431,12 +1436,14 @@ class TGB:
 			pygame.display.flip()
 			
 			# End of AI act
-			self.end_turn()
+			# self.end_turn()
 		else:
 			self.draw_scoreboard(True)
+			self.drawmap()
+			pygame.display.flip()
 			# If the human player has lost game, he is not going to play
-			if yksikko.lost:
-				self.end_turn()
+			#if yksikko.lost:
+			#	self.end_turn()
 
 
 def load_image_files_but_not_interface_image_files(imagehandler,graphics_path):

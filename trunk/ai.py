@@ -20,6 +20,7 @@
 #------------------------------------------------------------------------
 
 import time,random
+from sets import Set
 
 class TAi:
 	def __init__(self,board):
@@ -29,12 +30,17 @@ class TAi:
 		# List of executed moves that is returned
 		act_list = {}
 		
+		own_soldier_actor_set = Set([])
+		for soldier in self.board.actors:
+			if not soldier.dump and soldier.side == self.board.turn:
+				own_soldier_actor_set.add(soldier)
+
 		# We'll iterate every actor through a copy
-		for current_actor in self.board.actors.copy():
+		for current_actor in own_soldier_actor_set:
 			if current_actor.dead:
 				continue
 			# We'll move only own soldiers that have not moved yet
-			if ((current_actor.dump == False) and (current_actor.moved == False) and (current_actor.side == self.board.turn)):
+			if not current_actor.dump and not current_actor.moved and current_actor.side == self.board.turn:
 				# Memory for found move
 				m_x = None
 				m_y = None
@@ -81,38 +87,15 @@ class TAi:
 							if vastustajan_saaren_vahvuus[1]:
 								rekursiotulos += len(vastustajan_saaren_vahvuus[1]) / 5
 							
-							# The target land is touched by how many own lands?
-							kosketuscount = 0
-							edu = self.board.get_right_edm(y2)
-							for ite in range(6):
-								if self.board.validxy(x2+edu[ite][0],y2+edu[ite][1]):
-									if self.board.data[self.board.gct(x2+edu[ite][0],y2+edu[ite][1])] == self.board.turn:
-										kosketuscount += 1
-										
-							# Add points accordingly, this could be replaced with
-							# ability to teach AI
-							if kosketuscount == 2:
-								rekursiotulos += 5
-							if kosketuscount == 3:
-								rekursiotulos += 4
-							if kosketuscount == 4:
-								rekursiotulos += 2
-							if kosketuscount == 5:
-								rekursiotulos += 7
-							if kosketuscount == 6:
-								rekursiotulos += 15
-							
 							# Is there an actor at target land?
 							defender = self.board.actorat(x2,y2)
 							if defender:
 								# There is an actor at target land,
 								# we'll add it into moves points
 								if defender.dump and current_actor.level > 1:
-									rekursiotulos += 6
-									rekursiotulos += defender.supplies
+									rekursiotulos += 5
+									rekursiotulos += defender.supplies / 2
 									rekursiotulos += (defender.income - defender.expends)
-									if rekursiotulos < 6:
-										rekursiotulos = 6
 								else:
 									rekursiotulos += defender.level * 2
 																			
@@ -163,7 +146,6 @@ class TAi:
 				if m_x and found_not_brute_force_solution==False:
 					# Normally we shouldn't end up here, but if we
 					# do, we choose the best current move.
-					time.sleep(1)
 					m_p = max(pisteet)
 					m_x = koords[pisteet.index(m_p)][0]
 					m_y = koords[pisteet.index(m_p)][1]
