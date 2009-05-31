@@ -443,7 +443,7 @@ class TGB:
 				if not target.dump and target.side != actori.side:
 					# Attacker and defender are level 6 soldiers
 					if actori.level == 6 and target.level == 6:
-						# 50% chance to win or loose
+						# 50% chance to win or lose
 						if random.randint(1,2) == 1:
 							# Attacker lost
 							actori.x,actori.y,actori.dead=0,0,True
