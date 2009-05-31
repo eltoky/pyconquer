@@ -168,6 +168,7 @@ while main_loop_running:
 		gb.fillmap(0)
 		
 		# Turn the editing mode on
+		gb.playerlist = []
 		gb.map_edit_mode = True
 		gb.map_edit_info = [m1,m2,1]
 		gb.actors.clear()

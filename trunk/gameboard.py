@@ -66,7 +66,7 @@ class TGB:
 		self.data = {}
 		
 		# How many "extra"-recursions cpu will make (max.) trying to figure out a good move
-		self.ai_recursion_depth = 7
+		self.ai_recursion_depth = 10
 		
 		# Pretty self-explanatory
 		self.show_cpu_moves_with_lines = True
@@ -219,6 +219,9 @@ class TGB:
 			if pelaaja:
 				if pelaaja.ai_controller or pelaaja.lost:
 					self.end_turn()
+				if pelaaja.won:
+					self.draw_scoreboard(False)
+					pygame.display.flip()
 			
 			# Iterate through events
 			for eventti in pygame.event.get():
@@ -654,8 +657,8 @@ class TGB:
 		# This just basically randoms coordinates and fills map
 		if (d > 0):
 			while (d > 0):
-				x = random.randint(1,max_x)
-				y = random.randint(1,13)
+				x = random.randint(2,max_x-2)
+				y = random.randint(2,12)
 				edm = self.get_right_edm(y)
 				for i in xrange(6):
 					if self.validxy(x+edm[i][0],y+edm[i][1]):
@@ -1096,11 +1099,22 @@ class TGB:
 								ok2=True
 						if ok2:
 							# Add new soldier and make financial calculus
+							# 80% - (lvl*10%) chance to update it
 							city.supplies -= 1
 							city.expends += 1
 							city.income -= 1
 							tulos1 = tulos[0].split(" ")
-							self.actors.add(TActor(int(tulos1[0]),int(tulos1[1]),city.side,level=1,dump=False))
+							urpo = TActor(int(tulos1[0]),int(tulos1[1]),city.side,level=1,dump=False)
+							
+							while city.supplies > 0 and (city.income-city.expends) > 0 and urpo.level < 6:
+								if random.randint(1,10) <= (9 - urpo.level):
+									urpo.level += 1
+									city.expends += 1
+								else:
+									break
+							
+							
+							self.actors.add(urpo)
 					# If we didn't buy with every supplies, we can update soldiers
 					if m11 or m22:
 						self.update_own_soldiers(city,tulos,ykkoscount,soldiercounter2,paatos)
@@ -1136,12 +1150,12 @@ class TGB:
 						if ukko.level < 6:
 							# Level 1 soldiers found
 							if ykkoscount > 0 and (soldiercounter2-ykkoscount) > 0:
-								if ukko.level != 1:
+								if ukko.level == 1:
 									# No critical need for updates?
 									if not paatos:
-										# 33% change to update 1<lvl<6
-										if random.randint(1,3) != 2:
-											# Ykkosille enemman prioriteettia
+										# 25% change to not to update lvl1
+										if random.randint(1,4) != 2:
+											# EI-Ykkosille enemman prioriteettia
 											continue
 							
 							# Soldier is updated
