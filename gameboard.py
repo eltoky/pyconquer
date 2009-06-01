@@ -151,8 +151,11 @@ class TGB:
 			file.write("%s|%d\n"%(k1,k2))
 		file.close() 
 	def read_scenarios(self):
-		# Get list of the scenario - folder's files
-		return os.listdir(os.path.join(self.gamepath,"scenarios"))
+		# Get list of the scenario - folder's files and remove ".svn" - folder
+		scenario_list = os.listdir(os.path.join(self.gamepath,"scenarios"))
+		if ".svn" in scenario_list:
+			scenario_list.remove(".svn")
+		return scenario_list
 	def load_skin_file(self,filename1):
 		# Load configuration file and read it into sc - dictionary
 		file = open(filename1,"r")
@@ -240,7 +243,7 @@ class TGB:
 					# Right mouse button = draft and update soldiers if
 					# NOT in map editing mode
 					if not self.map_edit_mode:
-						if eventti.button == 3 and y1 < 14 and x1 < 15 :
+						if eventti.button == 3 and y1 < 15 and x1 < 30:
 							self.draft_soldier(self.cursor.x,self.cursor.y)
 				# Key press
 				if eventti.type == pygame.KEYDOWN:
@@ -302,7 +305,7 @@ class TGB:
 
 		if randommap:
 			# Generate random map
-			self.generate_map(50,13)
+			self.generate_map(50, random.randint(13,27) )
 		else:
 			# Read a scenario
 			self.load_map(os.path.join(self.gamepath,"scenarios")+os.sep+scenariofile)
@@ -466,7 +469,7 @@ class TGB:
 					# land, it is discarded (destroyed)
 					target.dead = True
 					self.actors.discard(target)
-				# Fix this to check one island (x2,y2) if dump merging needed
+				# Fix this to check one island (x2,y2) if dump creating needed
 				self.fill_dumps()
 		else:
 			# Target is blocked, show the reason for blocking
@@ -597,15 +600,23 @@ class TGB:
 				# 2 pieces of land and island is owned by existing player.
 				if not search_dumps[0] and len(search_dumps[1]) > 1:
 					
-					# Find a new place for dump:
-					#	- get a random coordinate from crawled island
-					paikka = random.choice(list(search_dumps[1]))
-					
-					if paikka:
-						# If a place was found for dump, we'll add
-						# a new dump in actors.
-						kalu = paikka.split(" ")
-						self.actors.add(TActor(int(kalu[0]),int(kalu[1]),self.data[paikka],dump=True))
+					# Panic method to exit loop
+					tries = 0
+					while tries < 100:
+						tries += 1
+						
+						# Find a new place for dump:
+						#	- get a random legal coordinate from crawled island
+						paikka = random.choice(list(search_dumps[1]))
+						
+						if paikka:
+							if not self.actorgctat(paikka):
+								# If a place was found for dump, we'll add
+								# a new dump in actors.
+								kalu = paikka.split(" ")
+								self.actors.add(TActor(int(kalu[0]),int(kalu[1]),self.data[paikka],dump=True))
+								# Break the loop
+								tries = 100
 
 				# More than one dump on island?
 				elif len(search_dumps[0]) > 1:
@@ -1099,12 +1110,21 @@ class TGB:
 								ok2=True
 						if ok2:
 							# Add new soldier and make financial calculus
-							# 80% - (lvl*10%) chance to update it
+							
 							city.supplies -= 1
 							city.expends += 1
 							city.income -= 1
 							tulos1 = tulos[0].split(" ")
 							urpo = TActor(int(tulos1[0]),int(tulos1[1]),city.side,level=1,dump=False)
+							
+							# 90% - (lvl*10%) chance to update it
+							# So mathematically possibility to update straight to level6:
+							# 0.8 * 0.7 * 0.6 * 0.5 * 0.4 = 7%
+							# Straight to level5:
+							# 17%
+							# Straight to level4:
+							# 34%
+							# And so on...
 							
 							while city.supplies > 0 and (city.income-city.expends) > 0 and urpo.level < 6:
 								if random.randint(1,10) <= (9 - urpo.level):
@@ -1325,6 +1345,10 @@ class TGB:
 		if flippaa:
 			pygame.display.flip()
 	def draft_soldier(self,x,y):
+		# Valid coordinate?
+		if not self.validxy(x,y):
+			return
+			
 		# Soldier drafting function used by human player
 		if self.data[self.gct(x,y)] != self.turn:
 			return
