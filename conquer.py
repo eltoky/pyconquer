@@ -51,7 +51,7 @@ random.seed(round(time.time()))
 IH = classcollection.TIH()
 
 # Setting Release Version...
-conquer_version = "0.1"
+conquer_version = "0.2"
 
 # Initialize the screen and set resolution
 screeni = pygame.display.set_mode((800,600))
@@ -110,25 +110,25 @@ while main_loop_running:
 	# Get selection from main menu
 	tulos = mainmenu.get_selection()
 	if tulos == 0:
-		
+
 		# Dynamically generate menu items from scenario - files
-		
+
 		# Read scenarios
 		scenarios = gb.read_scenarios()
-		
+
 		generated_menu_items = []
-		
-		# Add option to step back to main menu 
+
+		# Add option to step back to main menu
 		generated_menu_items.append(("Back to Menu",0,[],None))
-		
+
 		# Add scenarios as menuitems
 		for i,scenario in enumerate(scenarios):
 			generated_menu_items.append((scenario,i+1,[],None))
-			
+
 		# Build the menu
 		newgamemenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
 		generated_menu_items, (800/2-10,200), spacing = 30)
-		
+
 		# Get selection from the newly build menu
 		selection = newgamemenu.get_selection()
 		if selection > 0:
@@ -142,10 +142,10 @@ while main_loop_running:
 		# Ask player counts
 		m1,m2 = gb.get_human_and_cpu_count()
 		gb.map_edit_mode = False
-		
+
 		# Initialize a new game
 		gb.new_game(randommap = True, humanplayers = m1, randomplayers_cpu = m2)
-		
+
 		# Start the game
 		gb.start_game()
 
@@ -163,23 +163,23 @@ while main_loop_running:
 		# FIXME: little better looking
 		# Ask player counts
 		m1,m2 = gb.get_human_and_cpu_count()
-		
+
 		# Fill map with empty space
 		gb.fillmap(0)
-		
+
 		# Turn the editing mode on
 		gb.playerlist = []
 		gb.map_edit_mode = True
 		gb.map_edit_info = [m1,m2,1]
 		gb.actors.clear()
-		
+
 		# Start Editing
 		gb.start_game()
 		# Editing Finished
-		
+
 		gb.map_edit_mode = False
 		gb.map_edit_info = []
-		
+
 	# User selected to quit the game
 	if tulos == 4:
 		main_loop_running = False
