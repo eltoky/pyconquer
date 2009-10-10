@@ -58,7 +58,7 @@ class TGameMenu:
 			if i == self.valinta:
 				# Selected menu item is red
 				shadow = False
-				kolori = (255,0,0)
+				kolori = (255,255,255)
 			
 			# Text to be rendered
 			teksti = itemi[0]
