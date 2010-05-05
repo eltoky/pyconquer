@@ -20,7 +20,6 @@
 #------------------------------------------------------------------------
 
 import time,random
-from sets import Set
 
 class TAi:
 	def __init__(self,board):
@@ -30,7 +29,7 @@ class TAi:
 		# List of executed moves that is returned
 		act_list = {}
 		
-		own_soldier_actor_set = Set([])
+		own_soldier_actor_set = set([])
 		for soldier in self.board.actors:
 			if not soldier.dump and soldier.side == self.board.turn and not soldier.moved:
 				own_soldier_actor_set.add(soldier)

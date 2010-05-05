@@ -131,7 +131,7 @@ class TGameMenu:
 					if e.key == pygame.K_UP:
 						self.rullaa(-1)
 						self.draw_items(teksti)
-					if e.key == pygame.K_RETURN:
+					if e.key == pygame.K_RETURN or e.key == pygame.K_KP_ENTER:
 						tulos = self.select()
 						return tulos
 					if e.key == pygame.K_LEFT:

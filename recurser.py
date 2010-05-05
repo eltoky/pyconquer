@@ -1,4 +1,3 @@
-from sets import Set
 import random
 
 #------------------------------------------------------------------------
@@ -27,11 +26,11 @@ _DEBUG =0
 class TRecurser:
 	def __init__(self,board):
 		self.board = board
-		self.recursed_land = Set([])
+		self.recursed_land = set([])
 		self.recursed_own_land_count = 0
 	def count_dumps_on_island(self,x,y):
 		# Initialize set to be used in crawling
-		land_area_rec = Set([])
+		land_area_rec = set([])
 		dumps_coord_list = []
 		puolisko = self.board.data[self.board.gct(x,y)]
 		# Crawl from (x,y), save crawling to land_area_rec and
@@ -50,7 +49,7 @@ class TRecurser:
 						dumps_coord_list.append(coordinate)
 		return [dumps_coord_list,land_area_rec]
 	def recurse_new_random_coord_for_dump_on_island(self,x,y):
-		land_area_rec = Set([])
+		land_area_rec = set([])
 		self.crawl(x,y,land_area_rec,[self.board.data[self.board.gct(x,y)]])
 		# Check if island has area to affor dump
 		if len(land_area_rec) > 1:
@@ -66,7 +65,7 @@ class TRecurser:
 		land_area = self.board.count_world_area()
 		if _DEBUG > 1:
 			print "World area: %d" % land_area
-		land_area_rec = Set([])
+		land_area_rec = set([])
 		
 		if _DEBUG > 1:
 			print playerlist
@@ -87,7 +86,7 @@ class TRecurser:
 	def count_own_islands(self):
 		# Count how many islands does player control
 		laskuri = 0
-		recursed_islands = Set([])
+		recursed_islands = set([])
 		for x in xrange(30):
 			for y in xrange(14):
 				if self.board.data[self.board.gct(x,y)] == self.board.turn:
@@ -97,10 +96,10 @@ class TRecurser:
 						laskuri += 1
 		return laskuri
 	def get_island_border_lands(self,x,y):
-		land_area_set = Set([])
+		land_area_set = set([])
 		island_owner = self.board.data[self.board.gct(x,y)]
 		self.crawl(x,y,land_area_set,[ island_owner ])
-		border_area_set = Set([])
+		border_area_set = set([])
 		for gct_xy in land_area_set:
 			x1,y1 = self.board.ec(gct_xy)
 			edm = self.board.get_right_edm(y1)

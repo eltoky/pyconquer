@@ -1,4 +1,3 @@
-from sets import Set
 import pygame, random, hex_system, time
 from sys import exit
 from operator import itemgetter
@@ -115,7 +114,7 @@ class TGB:
 		
 		# Actors set (set for optimization purposes) which holds every
 		# instance of Actor-class (Soldiers and Dumps at the moment)
-		self.actors = Set([])
+		self.actors = set([])
 		
 		# Load the skin configuration file
 		self.load_skin_file("skin")
@@ -134,7 +133,7 @@ class TGB:
 	def write_edit_map(self,filunimi):
 		# Write edited map to file.
 		# First six lines in map file are reserved for player info.
-		file = open(filunimi,"w\n")
+		file = open(filunimi,"w")
 		# Add human players
 		for i in range(self.map_edit_info[0]):
 			file.write("player\n")
@@ -374,7 +373,7 @@ class TGB:
 			if e == pygame.K_BACKSPACE:
 				if curstr:
 					del curstr[len(curstr)-1]
-			if e == pygame.K_RETURN:
+			if e == pygame.K_RETURN or e == pygame.K_KP_ENTER:
 				break
 			if not onlynumbers:
 				if e <= 127 and e != pygame.K_BACKSPACE:
@@ -382,6 +381,14 @@ class TGB:
 			else:
 				if e <= 127 and e != pygame.K_BACKSPACE and chr(e) in ["1","2","3","4","5","6","7","8","9","0"]:
 					curstr.append(chr(e))				
+				elif e in [pygame.K_KP1,pygame.K_KP2, pygame.K_KP3,pygame.K_KP4,pygame.K_KP5,pygame.K_KP6]:
+					if ( e == pygame.K_KP1 ) : curstr.append("1")
+					elif ( e == pygame.K_KP2 ) : curstr.append("2")
+					elif ( e == pygame.K_KP3 ) : curstr.append("3")
+					elif ( e == pygame.K_KP4 ) : curstr.append("4")
+					elif ( e == pygame.K_KP5 ) : curstr.append("5")
+					elif ( e == pygame.K_KP6 ) : curstr.append("6")
+					
 			self.text_at("".join(curstr), (((x1+(x1+w1))/2)-(len(curstr)*4),y1+15),wipe_background=False,fontti=font4)
 			pygame.display.flip()
 		return "".join(curstr)
@@ -568,7 +575,7 @@ class TGB:
 		# CPU INTENSIVE?
 
 		# Keep count of already searched lands
-		searched = Set([])
+		searched = set([])
 		
 		# Get list of current non-lost players
 		pelaajat = self.get_player_id_list()
@@ -911,7 +918,7 @@ class TGB:
 				return [True,x,y,"ownspacealreadyoccupied"]
 			
 		# Set that holds recursed land piece coordinates	
-		crawl_list = Set([])
+		crawl_list = set([])
 		
 		# Recurse every land on the island where attacking soldier is
 		self.rek.crawl(actori.x,actori.y,crawl_list,[self.turn])
@@ -1257,7 +1264,7 @@ class TGB:
 		koordilista = []
 		mahdollinen_kuolema = []
 		kuolema = []
-		koordilista = Set([])
+		koordilista = set([])
 		for kaupunki in self.actors:
 			mahdollinen_kuolema = []
 			koordilista.clear()
