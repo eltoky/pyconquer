@@ -1,5 +1,5 @@
 #summary For users - how to run game on Windows
-#labels Phase-Deploy
+#labels Featured
 
 = Running Conquer game on your Windows =
 
