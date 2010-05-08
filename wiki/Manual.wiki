@@ -6,19 +6,17 @@
 This is a copy of manual.txt file that's enclosed with the game, as of May 8th 2010.
 Included here for as an alternative documentation (for those who prefer web docs or missed the manual.txt enclosed).
 
-= Manual =
-
-Conquer manual
+= Conquer Manual =
 
 - Players goal is to eliminate enemy players.
 
-Units:
+===Units:===
 	Soldier - Unit that conquers land. Has 6 power levels.
 			  (1 being the weakest and 6 the strongest)
 	
 	Resource Dump - Your islands base of action
 
-Island:
+===Island:===
 
 	Two or more same colored lands that are connected. Every island
 	has its own resource dump. When two islands merge into one larger,
@@ -26,7 +24,7 @@ Island:
 	old supplies are brought and added from the two old ones (which
 	are then discarded).
 
-Resource Dump:
+===Resource Dump:===
 
 	Your islands base of action. Resource Dump supply income equals
 	to its islands land area. Islands soldiers levels are added to
@@ -37,7 +35,7 @@ Resource Dump:
 	resource dump is conquered by enemy soldier, a new one is created
 	at random location on the island but with zero supplies.
 
-Rules conserning soldiers:
+==Rules concerning soldiers:==
 
 	- Soldier can't conquer land which:
 			* is defended by stronger soldier
@@ -67,7 +65,7 @@ Rules conserning soldiers:
 		Can conquer any reachable land. Attacking another level 6
 		soldier has 50% chance of winning or getting killed.
 		
-Interface:
+==Interface:==
 	- Red box shows selected soldier
 	- Number of Resource Dump = its supplies
 	- Number on a soldier tells its level
