@@ -101,7 +101,7 @@ mainmenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
 optionsmenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
 [("Show CPU moves with lines",0,["value_bool_editor",gb.show_cpu_moves_with_lines],"(Use left and right arrow key) Show CPU soldiers moves with lines."),
 ("CPU AI Recursion Depth",1,["value_int_editor",gb.ai_recursion_depth,[1,20]],"(Use left and right arrow key) Increase AI Recursion Depth: computer may play better but uses more CPU."),
-("Return",2,[],None)],
+("Full Screen", 3, [],"OnOff Full Screen"),("Return",2,[],None)],
 (800/2-10,200), spacing = 60)
 
 # The true main loop behing the whole application
@@ -157,6 +157,8 @@ while main_loop_running:
 			tulos2 = optionsmenu.get_selection()
 			if tulos2 == 2:
 				break
+			if tulos2 == 3:
+				pygame.display.toggle_fullscreen()
 
 	# User selected to edit a scenario
 	if tulos == 3:

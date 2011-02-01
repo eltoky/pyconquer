@@ -43,8 +43,9 @@ class TGameMenu:
 		# If images and/or text are supplied, draw them
 		if self.menukuva:
 			self.ruutu.blit(self.menukuva,(0,0))
-		if self.logo:
-			self.ruutu.blit(self.logo,(263,0))
+		#Logo in BackGround now
+		#if self.logo:			
+			#self.ruutu.blit(self.logo,(263,0))
 		if teksti:
 			self.text_at(teksti[0],(teksti[1],teksti[2]),self.used_font,wipe_background=True,vari=(255,255,255))
 		
