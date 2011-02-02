@@ -51,7 +51,7 @@ import playlist
 PlayList = playlist.TPlayList()
 PlayList.AddMedia(music_path+"soundtrack.ogg")
 #PlayList.AddMedia(music_path+"battle.ogg")
-PlayList.Play()
+PlayList.Play(-1)
 
 
 # Generate new random seed
