@@ -32,9 +32,11 @@ _DEBUG = 0
 
 # Initialize pygame
 pygame.init()
+pygame.mixer.init()
 
 # Path for game's graphics
 graphics_path = path[0] + sep + "images" + sep
+music_path = path[0] + sep + "music" + sep
 
 # Set the icon for the game window
 pygame.display.set_icon(pygame.image.load(graphics_path+"soldier.png"))
@@ -43,6 +45,14 @@ pygame.display.set_icon(pygame.image.load(graphics_path+"soldier.png"))
 import gameboard
 from gameboard import TGB
 import gamemenu
+import playlist
+
+#Creating playlist
+PlayList = playlist.TPlayList()
+PlayList.AddMedia(music_path+"soundtrack.ogg")
+#PlayList.AddMedia(music_path+"battle.ogg")
+PlayList.Play()
+
 
 # Generate new random seed
 random.seed(round(time.time()))
@@ -107,6 +117,9 @@ optionsmenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
 # The true main loop behing the whole application
 main_loop_running = True
 while main_loop_running:
+	#check soundtrack
+	#PlayList.CheckIfNext()
+	
 	# Get selection from main menu
 	tulos = mainmenu.get_selection()
 	if tulos == 0:
