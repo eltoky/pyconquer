@@ -36,6 +36,8 @@ class TPlayList:
 	def Play(self,loops=0):
 		self.chan.play(self.playlist[self.mediaID],loops)
 	#Check if it is time to start next track
+	def Stop(self):
+		self.chan.stop()
 	def CheckIfNext(self):
 		if not self.chan.get_busy() :
 			if self.mediaID == (len(self.playlist)-1) :
