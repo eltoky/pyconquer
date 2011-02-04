@@ -24,11 +24,16 @@
 
 # This is one of the sloppiest looking files in the project...
 
-import random,pygame,time,classcollection
+import random,pygame,time,classcollection,ConfigParser
 from sys import path
 from os import sep
 
 _DEBUG = 0
+
+# Load config file
+config = ConfigParser.RawConfigParser()
+config.read(path[0] + sep + 'settings.ini')
+
 
 # Initialize pygame
 pygame.init()
@@ -50,10 +55,9 @@ import playlist
 #Creating playlist
 PlayList = playlist.TPlayList()
 PlayList.AddMedia(music_path+"soundtrack.ogg")
-#PlayList.AddMedia(music_path+"battle.ogg")
-PlayList.Play(-1)
-
-
+if config.get('MainConf', 'soundtrack') == 'true' :
+	PlayList.Play(-1)
+	
 # Generate new random seed
 random.seed(round(time.time()))
 
@@ -65,6 +69,10 @@ conquer_version = "0.2"
 
 # Initialize the screen and set resolution
 screeni = pygame.display.set_mode((800,600))
+
+#Check for full screen
+if config.get('MainConf', 'fullscreen') == 'true' :
+	pygame.display.toggle_fullscreen()
 
 # Set windows caption
 pygame.display.set_caption("Conquer " + conquer_version)
@@ -81,6 +89,11 @@ gameboard.load_image_files_but_not_interface_image_files(IH,graphics_path)
 # Create the Game Board
 # Parameters: pygame screen, image container and game path
 gb = TGB(screeni,IH,path[0])
+
+if config.get('MainConf', 'cpu_movesl') == 'true' :
+	gb.show_cpu_moves_with_lines = True
+else :
+	gb.show_cpu_moves_with_lines = False
 
 # Load the interface images... at the moment they need
 # to be loaded after the Game Board has an instance
@@ -111,7 +124,7 @@ mainmenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
 optionsmenu = gamemenu.TGameMenu(screeni, IH.gi("menu_interface"),IH.gi("logo"),
 [("Show CPU moves with lines",0,["value_bool_editor",gb.show_cpu_moves_with_lines],"(Use left and right arrow key) Show CPU soldiers moves with lines."),
 ("CPU AI Recursion Depth",1,["value_int_editor",gb.ai_recursion_depth,[1,20]],"(Use left and right arrow key) Increase AI Recursion Depth: computer may play better but uses more CPU."),
-("Full Screen", 3, [],"OnOff Full Screen"),("Return",2,[],None)],
+("Full Screen", 3, [],"OnOff Full Screen"),("Soundtrack", 4, [],"OnOff Soundtrack"),("Return",2,[],None)],
 (800/2-10,200), spacing = 60)
 
 # The true main loop behing the whole application
@@ -169,9 +182,26 @@ while main_loop_running:
 			# if user wants to get back to the main menu
 			tulos2 = optionsmenu.get_selection()
 			if tulos2 == 2:
+				if gb.show_cpu_moves_with_lines == False :
+					config.set('MainConf','cpu_movesl', 'false')
+				else :
+					config.set('MainConf','cpu_movesl', 'true')
+				with open(path[0] + sep + 'settings.ini', 'wb') as configfile:
+					config.write(configfile)
 				break
 			if tulos2 == 3:
 				pygame.display.toggle_fullscreen()
+				if config.get('MainConf', 'fullscreen') == 'true' :
+					config.set('MainConf','fullscreen', 'false')
+				else :
+					config.set('MainConf','fullscreen', 'true')
+			if tulos2 == 4:
+				if config.get('MainConf', 'soundtrack') == 'true' :
+					config.set('MainConf','soundtrack', 'false')
+					PlayList.Stop()
+				else :
+					config.set('MainConf','soundtrack', 'true')
+					PlayList.Play(-1)		
 
 	# User selected to edit a scenario
 	if tulos == 3:
