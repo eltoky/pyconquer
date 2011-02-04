@@ -226,7 +226,8 @@ class TGB:
 			if rivi[0] == "making_moves_text_color":
 				self.sc["making_moves_text_color"] = (int(rivi[1]),int(rivi[2]),int(rivi[3]))
 			
-	def start_game(self):
+	def start_game(self,):
+		
 		self.gamerunning = True
 		
 		# Instance of pygame's Clock
@@ -234,6 +235,7 @@ class TGB:
 		
 		# The Main Loop to run a game
 		while self.gamerunning:
+			
 			
 			# Limit fps to 30, smaller resource usage
 			clock.tick(30)
@@ -840,12 +842,18 @@ class TGB:
 					# Draw the piece
 					self.screen.blit(self.pics.gi(str(self.data[self.gct(x,y)])),(pixelX,pixelY))
 					
-					# Check if actor is found at the coordinates
+					
+		#Draw actors
+		for x in xrange(self.cursor.scroll_x,15+self.cursor.scroll_x):
+			for y in xrange(14):
+				pixelX,pixelY = self.hexMapToPixel(x-self.cursor.scroll_x,y)
+				# There is land to draw
+				if self.data[self.gct(x,y)] > 0:
 					actor = self.actorat(x,y)
 					if actor:
 						if actor.dump:
 							# a Resource Dump was found
-							self.screen.blit(self.pics.gi("dump"),(pixelX+3,pixelY+8))
+							self.screen.blit(self.pics.gi("dump"),(pixelX,pixelY))
 							
 							# If the dump is on our side and we are not AI controlled, then we'll
 							# draw the supply count on the dump.
@@ -859,9 +867,22 @@ class TGB:
 							if actor.moved:
 								teksti = teksti + "X"
 							# Draw soldier
-							self.screen.blit(self.pics.gi("soldier"),(pixelX+10,pixelY+10))
+							if actor.level == 1 :
+								self.screen.blit(self.pics.gi("soldier"),(pixelX,pixelY))
+							elif actor.level == 2 :
+								self.screen.blit(self.pics.gi("soldier2"),(pixelX,pixelY))
+							elif actor.level == 3 :
+								self.screen.blit(self.pics.gi("soldier3"),(pixelX,pixelY))
+							elif actor.level == 4 :
+								self.screen.blit(self.pics.gi("soldier4"),(pixelX,pixelY))
+							elif actor.level == 5 :
+								self.screen.blit(self.pics.gi("soldier5"),(pixelX,pixelY))
+							elif actor.level == 6 :
+								self.screen.blit(self.pics.gi("soldier6"),(pixelX,pixelY))
+							
 							# Draw text for the soldier
 							self.text_at(teksti,(pixelX+20,pixelY+20),fontti=font)
+							
 		# If an actor is selected, then we'll draw red box around the actor
 		if self.cursor.chosen_actor:
 			pixelX,pixelY = self.hexMapToPixel(self.cursor.x-self.cursor.scroll_x,self.cursor.y)
@@ -1519,9 +1540,24 @@ def load_image_files_but_not_interface_image_files(imagehandler,graphics_path):
 	temppi = pygame.image.load(graphics_path+"skull7.png").convert_alpha()
 	temppi.set_colorkey(temppi.get_at((0,0)))
 	imagehandler.add_image(temppi,"skull")
-	temppi = pygame.image.load(graphics_path+"soldier.png").convert_alpha()
+	temppi = pygame.image.load(graphics_path+"soldier0.png").convert_alpha()
 	temppi.set_colorkey(temppi.get_at((0,0)))
 	imagehandler.add_image(temppi,"soldier")
+	temppi = pygame.image.load(graphics_path+"soldier1.png").convert_alpha()
+	temppi.set_colorkey(temppi.get_at((0,0)))
+	imagehandler.add_image(temppi,"soldier2")
+	temppi = pygame.image.load(graphics_path+"soldier2.png").convert_alpha()
+	temppi.set_colorkey(temppi.get_at((0,0)))
+	imagehandler.add_image(temppi,"soldier3")
+	temppi = pygame.image.load(graphics_path+"soldier3.png").convert_alpha()
+	temppi.set_colorkey(temppi.get_at((0,0)))
+	imagehandler.add_image(temppi,"soldier4")
+	temppi = pygame.image.load(graphics_path+"soldier4.png").convert_alpha()
+	temppi.set_colorkey(temppi.get_at((0,0)))
+	imagehandler.add_image(temppi,"soldier5")
+	temppi = pygame.image.load(graphics_path+"soldier5.png").convert_alpha()
+	temppi.set_colorkey(temppi.get_at((0,0)))
+	imagehandler.add_image(temppi,"soldier6")	
 	temppi = pygame.image.load(graphics_path+"armytent.png").convert_alpha()
 	temppi.set_colorkey(temppi.get_at((0,0)))
 	imagehandler.add_image(temppi,"dump")
